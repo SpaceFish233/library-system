@@ -192,7 +192,7 @@ import {
   WarningFilled,
   Clock
 } from '@element-plus/icons-vue'
-import { getAllBorrows, confirmReturn } from '../../api/borrow'
+import { getAllBorrows, confirmReturn, getBorrowStats } from '../../api/borrow'
 
 const loading = ref(false)
 const records = ref([])
@@ -233,6 +233,18 @@ function getStatusText(status) {
   return map[status] || status
 }
 
+async function fetchStats() {
+  try {
+    const res = await getBorrowStats()
+    stats.borrowed = res.data.borrowed || 0
+    stats.pending = res.data.pending_return || 0
+    stats.returned = res.data.returned || 0
+    stats.overdue = res.data.overdue || 0
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 async function fetchRecords() {
   loading.value = true
   try {
@@ -247,12 +259,6 @@ async function fetchRecords() {
     const res = await getAllBorrows(params)
     records.value = res.data.records
     total.value = res.data.total
-
-    // Calculate stats
-    stats.borrowed = records.value.filter(r => r.status === 'BORROWED').length
-    stats.pending = records.value.filter(r => r.status === 'PENDING_RETURN').length
-    stats.returned = records.value.filter(r => r.status === 'RETURNED').length
-    stats.overdue = records.value.filter(r => r.status === 'OVERDUE').length
   } catch (e) {
     console.error(e)
   } finally {
@@ -292,6 +298,7 @@ async function handleConfirmReturn(record) {
       ElMessage.success('确认归还成功！')
     }
     fetchRecords()
+    fetchStats()
   } catch (e) {
     if (e !== 'cancel') {
       // Error handled by interceptor
@@ -301,6 +308,7 @@ async function handleConfirmReturn(record) {
 
 onMounted(() => {
   fetchRecords()
+  fetchStats()
 })
 </script>
 

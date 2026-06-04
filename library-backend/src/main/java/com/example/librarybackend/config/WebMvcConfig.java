@@ -30,7 +30,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
                         "/api/user/login",
-                        "/api/user/register"
+                        "/api/user/register",
+                        "/api/reserve/waiting-count/**"
                 );
 
         // 管理员拦截器（在登录拦截器之后执行）

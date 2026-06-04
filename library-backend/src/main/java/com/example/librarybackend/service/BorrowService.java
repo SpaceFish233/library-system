@@ -14,4 +14,5 @@ public interface BorrowService extends IService<BorrowRecord> {
     BorrowRecord getRecordDetail(Long recordId);
     IPage<BorrowRecord> getMyRecords(Long userId, String status, int page, int size);
     IPage<BorrowRecord> getAllRecords(String username, String bookName, String status, int page, int size);
+    Map<String, Object> getStats();
 }

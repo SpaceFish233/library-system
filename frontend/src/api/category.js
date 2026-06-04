@@ -10,6 +10,11 @@ export function getChildrenCategories(parentId) {
   return request.get(`/categories/${parentId}/children`)
 }
 
+// 根据ID获取分类详情
+export function getCategoryById(id) {
+  return request.get(`/categories/${id}`)
+}
+
 // 添加分类（管理员）
 export function addCategory(data) {
   return request.post('/categories', data)

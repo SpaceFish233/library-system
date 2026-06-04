@@ -25,6 +25,11 @@ export function getAllBorrows(params) {
   return request.get('/borrow/all', { params })
 }
 
+// 获取借阅统计（管理员）
+export function getBorrowStats() {
+  return request.get('/borrow/stats')
+}
+
 // 获取借阅记录详情
 export function getBorrowDetail(recordId) {
   return request.get(`/borrow/${recordId}`)

@@ -10,7 +10,9 @@ import com.example.librarybackend.service.ReserveService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reserve")
@@ -54,6 +56,14 @@ public class ReserveController {
         User currentUser = UserContext.getUser();
         reserveService.cancelReservation(currentUser.getId(), reserveId);
         return Result.success("取消成功");
+    }
+
+    @GetMapping("/waiting-count/{bookId}")
+    public Result<?> getWaitingCount(@PathVariable Long bookId) {
+        int count = reserveService.getWaitingCount(bookId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", count);
+        return Result.success(result);
     }
 
     @RequireAdmin

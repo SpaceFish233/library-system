@@ -68,6 +68,13 @@ public class BorrowController {
     }
 
     @RequireAdmin
+    @GetMapping("/stats")
+    public Result<?> getStats() {
+        Map<String, Object> stats = borrowService.getStats();
+        return Result.success(stats);
+    }
+
+    @RequireAdmin
     @GetMapping("/all")
     public Result<?> getAllRecords(
             @RequestParam(required = false) String username,

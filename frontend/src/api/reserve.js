@@ -29,3 +29,8 @@ export function cancelReserve(reserveId) {
 export function getAllReserves() {
   return request.get('/reserve/all')
 }
+
+// 获取某本书的预约等待人数（公开接口）
+export function getWaitingCount(bookId) {
+  return request.get(`/reserve/waiting-count/${bookId}`)
+}

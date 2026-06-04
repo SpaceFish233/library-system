@@ -178,9 +178,9 @@ import {
   InfoFilled
 } from '@element-plus/icons-vue'
 import { getBookDetail } from '../../api/book'
-import { getFirstLevelCategories } from '../../api/category'
+import { getCategoryById } from '../../api/category'
 import { borrowBook } from '../../api/borrow'
-import { reserveBook, getMyReserves } from '../../api/reserve'
+import { reserveBook, getWaitingCount } from '../../api/reserve'
 
 const router = useRouter()
 const route = useRoute()
@@ -201,18 +201,18 @@ async function fetchBookDetail() {
 
     // Fetch category name
     if (res.data.categoryId) {
-      const catRes = await getFirstLevelCategories()
-      const cat = catRes.data.find(c => c.id === res.data.categoryId)
-      if (cat) categoryName.value = cat.name
+      try {
+        const catRes = await getCategoryById(res.data.categoryId)
+        categoryName.value = catRes.data.name
+      } catch (e) {
+        // Ignore
+      }
     }
 
-    // Fetch waiting count from my reserves (simplified)
+    // Fetch waiting count
     try {
-      const reservesRes = await getMyReserves()
-      const waiting = reservesRes.data.filter(
-        r => r.bookId === res.data.id && r.status === 'WAITING'
-      )
-      waitingCount.value = waiting.length
+      const waitingRes = await getWaitingCount(res.data.id)
+      waitingCount.value = waitingRes.data.count
     } catch (e) {
       // Ignore
     }

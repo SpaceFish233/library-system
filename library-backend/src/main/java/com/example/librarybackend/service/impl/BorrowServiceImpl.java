@@ -77,13 +77,10 @@ public class BorrowServiceImpl extends ServiceImpl<BorrowRecordMapper, BorrowRec
         }
 
         // 4. 计算应还日期
-        LocalDateTime dueDate;
+        LocalDate dueDate;
         if (duration != null && unit != null) {
             long totalDays;
             switch (unit) {
-                case "second":
-                    totalDays = 0;
-                    break;
                 case "day":
                     totalDays = duration;
                     break;
@@ -99,13 +96,12 @@ public class BorrowServiceImpl extends ServiceImpl<BorrowRecordMapper, BorrowRec
             if (totalDays > 30) {
                 throw new RuntimeException("最大借阅时长不能超过30天");
             }
-            if ("second".equals(unit)) {
-                dueDate = LocalDateTime.now().plusSeconds(duration);
-            } else {
-                dueDate = LocalDateTime.now().plusDays(totalDays);
+            if (totalDays < 1) {
+                throw new RuntimeException("借阅时长不能少于1天");
             }
+            dueDate = LocalDate.now().plusDays(totalDays);
         } else {
-            dueDate = LocalDateTime.now().plusDays(borrowDays);
+            dueDate = LocalDate.now().plusDays(borrowDays);
         }
 
         // 5. 扣减库存
@@ -151,20 +147,20 @@ public class BorrowServiceImpl extends ServiceImpl<BorrowRecordMapper, BorrowRec
         bookService.updateById(book);
 
         // 3. 计算应还日期
-        LocalDateTime dueDate;
+        LocalDate dueDate;
         if (duration != null && unit != null) {
             long totalDays;
             switch (unit) {
-                case "second": totalDays = 0; break;
                 case "day": totalDays = duration; break;
                 case "week": totalDays = duration * 7L; break;
                 case "month": totalDays = duration * 30L; break;
                 default: throw new RuntimeException("不支持的借阅单位");
             }
             if (totalDays > 30) throw new RuntimeException("最大借阅时长不能超过30天");
-            dueDate = "second".equals(unit) ? LocalDateTime.now().plusSeconds(duration) : LocalDateTime.now().plusDays(totalDays);
+            if (totalDays < 1) throw new RuntimeException("借阅时长不能少于1天");
+            dueDate = LocalDate.now().plusDays(totalDays);
         } else {
-            dueDate = LocalDateTime.now().plusDays(borrowDays);
+            dueDate = LocalDate.now().plusDays(borrowDays);
         }
 
         // 4. 创建借阅记录
@@ -213,9 +209,9 @@ public class BorrowServiceImpl extends ServiceImpl<BorrowRecordMapper, BorrowRec
         int overdueDays = 0;
 
         // 2. 判断是否逾期
-        LocalDateTime now = LocalDateTime.now();
-        if (now.isAfter(record.getDueDate())) {
-            overdueDays = (int) ChronoUnit.DAYS.between(record.getDueDate().toLocalDate(), now.toLocalDate());
+        LocalDate today = LocalDate.now();
+        if (today.isAfter(record.getDueDate())) {
+            overdueDays = (int) ChronoUnit.DAYS.between(record.getDueDate(), today);
             if (overdueDays == 0) overdueDays = 1;
             fine = BigDecimal.valueOf(overdueDays * finePerDay);
 
@@ -311,5 +307,17 @@ public class BorrowServiceImpl extends ServiceImpl<BorrowRecordMapper, BorrowRec
 
         wrapper.orderByDesc(BorrowRecord::getCreateTime);
         return page(new Page<>(page, size), wrapper);
+    }
+
+    @Override
+    public Map<String, Object> getStats() {
+        Map<String, Object> stats = new HashMap<>();
+        String[] statuses = {"BORROWED", "PENDING_RETURN", "RETURNED", "OVERDUE"};
+        for (String s : statuses) {
+            LambdaQueryWrapper<BorrowRecord> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(BorrowRecord::getStatus, s);
+            stats.put(s.toLowerCase(), count(wrapper));
+        }
+        return stats;
     }
 }

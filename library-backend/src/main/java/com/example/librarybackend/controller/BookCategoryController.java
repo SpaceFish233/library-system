@@ -28,6 +28,15 @@ public class BookCategoryController {
         return Result.success(list);
     }
 
+    @GetMapping("/{id}")
+    public Result<?> getCategoryById(@PathVariable Long id) {
+        BookCategory category = categoryService.getCategoryById(id);
+        if (category == null) {
+            return Result.error("分类不存在");
+        }
+        return Result.success(category);
+    }
+
     @RequireAdmin
     @PostMapping
     public Result<?> addCategory(@RequestBody BookCategory category) {

@@ -36,6 +36,11 @@ public class BookCategoryServiceImpl extends ServiceImpl<BookCategoryMapper, Boo
     }
 
     @Override
+    public BookCategory getCategoryById(Long id) {
+        return getById(id);
+    }
+
+    @Override
     public void addCategory(BookCategory category) {
         // 参数校验
         if (category.getName() == null || category.getName().trim().isEmpty()) {

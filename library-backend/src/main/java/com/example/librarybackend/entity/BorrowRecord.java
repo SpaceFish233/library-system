@@ -20,7 +20,7 @@ public class BorrowRecord {
     private Long userId;
     private Long bookId;
     private LocalDate borrowDate;
-    private LocalDateTime dueDate;      // 应还日期
+    private LocalDate dueDate;          // 应还日期
     private LocalDate returnDate;       // 实际归还日期，null表示未还
     private String status;              // BORROWED, RETURNED, OVERDUE
     private BigDecimal fineAmount;      // 罚金
