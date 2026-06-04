@@ -1,0 +1,29 @@
+{
+  "disabledSkills": [
+    "caveman",
+    "diagnose",
+    "docx",
+    "grill-me",
+    "grill-with-docs",
+    "handoff",
+    "improve-codebase-architecture",
+    "pdf",
+    "pptx",
+    "prototype",
+    "tdd",
+    "to-issues",
+    "to-prd",
+    "triage",
+    "write-a-skill",
+    "xlsx",
+    "update-config",
+    "keybindings-help",
+    "simplify",
+    "fewer-permission-prompts",
+    "loop",
+    "claude-api",
+    "init",
+    "review",
+    "security-review"
+  ]
+}

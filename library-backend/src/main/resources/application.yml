@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/librarysystem?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: root
+    password: 123456
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.example.librarybackend.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+# 文件上传路径
+file:
+  upload-path: E:/uploads/library-covers/
+
+# JWT配置
+jwt:
+  secret: library-system-jwt-secret-key-2024-very-long-and-secure
+  expiration: 86400000
+
+# 借阅配置
+borrow:
+  credit-threshold: 60
+  borrow-days: 30
+  fine-per-day: 0.5
+  credit-deduct-per-day: 2
