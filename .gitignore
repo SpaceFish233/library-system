@@ -44,5 +44,4 @@ build/
 .env.production
 .env.development
 
-.claude/skills/ui-ux-pro-max-skill/cli/assets/scripts/.coverage
-.claude/skills/ui-ux-pro-max-skill/cli/assets/scripts/tests/.coverage
+.claude/
