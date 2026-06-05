@@ -72,6 +72,19 @@ CREATE TABLE IF NOT EXISTS `reserve_record` (
     FOREIGN KEY (`book_id`) REFERENCES `book`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预约记录表';
 
+-- 通知表
+CREATE TABLE IF NOT EXISTS `notification` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+    `content` VARCHAR(500) NOT NULL COMMENT '通知内容',
+    `type` VARCHAR(20) COMMENT '通知类型',
+    `related_id` BIGINT COMMENT '关联ID',
+    `is_read` TINYINT NOT NULL DEFAULT 0 COMMENT '是否已读: 0未读/1已读',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通知表';
+
 -- 初始化管理员账号 (密码: admin123, BCrypt加密)
 INSERT INTO `user` (`username`, `password`, `nickname`, `role`, `credit_score`) VALUES
 ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '系统管理员', 'admin', 100);
