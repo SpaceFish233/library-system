@@ -23,8 +23,9 @@ public class BookController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) String publisher) {
-        IPage<Book> result = bookService.searchBooks(page, size, keyword, author, categoryId, publisher);
+            @RequestParam(required = false) String publisher,
+            @RequestParam(defaultValue = "newest") String sortBy) {
+        IPage<Book> result = bookService.searchBooks(page, size, keyword, author, categoryId, publisher, sortBy);
         return Result.success(result);
     }
 

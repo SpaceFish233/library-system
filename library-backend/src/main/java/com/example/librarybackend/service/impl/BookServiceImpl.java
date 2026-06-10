@@ -39,7 +39,7 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
     private ReserveService reserveService;
 
     @Override
-    public IPage<Book> searchBooks(int page, int size, String keyword, String author, Long categoryId, String publisher) {
+    public IPage<Book> searchBooks(int page, int size, String keyword, String author, Long categoryId, String publisher, String sortBy) {
         LambdaQueryWrapper<Book> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.hasText(keyword)) {
             wrapper.like(Book::getTitle, keyword);
@@ -53,7 +53,20 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
         if (StringUtils.hasText(publisher)) {
             wrapper.like(Book::getPublisher, publisher);
         }
-        wrapper.orderByDesc(Book::getCreateTime);
+        switch (sortBy) {
+            case "title":
+                wrapper.orderByAsc(Book::getTitle);
+                break;
+            case "author":
+                wrapper.orderByAsc(Book::getAuthor);
+                break;
+            case "stock":
+                wrapper.orderByDesc(Book::getStock);
+                break;
+            default:
+                wrapper.orderByDesc(Book::getCreateTime);
+                break;
+        }
         return page(new Page<>(page, size), wrapper);
     }
 

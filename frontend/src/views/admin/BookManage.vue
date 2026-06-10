@@ -37,12 +37,19 @@
           clearable
           class="search-select"
         >
-          <el-option
+          <el-option-group
             v-for="cat in categories"
             :key="cat.id"
             :label="cat.name"
-            :value="cat.id"
-          />
+          >
+            <el-option :label="cat.name" :value="cat.id" />
+            <el-option
+              v-for="child in cat.children"
+              :key="child.id"
+              :label="'　' + child.name"
+              :value="child.id"
+            />
+          </el-option-group>
         </el-select>
         <el-button type="primary" class="search-btn" @click="handleSearch">
           <el-icon><Search /></el-icon>
@@ -80,7 +87,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="author" label="作者" width="120" show-overflow-tooltip />
+        <el-table-column prop="author" label="作者" min-width="160" show-overflow-tooltip />
 
         <el-table-column prop="isbn" label="ISBN" width="150" show-overflow-tooltip />
 
@@ -162,12 +169,19 @@
 
         <el-form-item label="分类" prop="categoryId">
           <el-select v-model="bookForm.categoryId" placeholder="选择分类" clearable style="width: 100%">
-            <el-option
+            <el-option-group
               v-for="cat in categories"
               :key="cat.id"
               :label="cat.name"
-              :value="cat.id"
-            />
+            >
+              <el-option :label="cat.name" :value="cat.id" />
+              <el-option
+                v-for="child in cat.children"
+                :key="child.id"
+                :label="'　' + child.name"
+                :value="child.id"
+              />
+            </el-option-group>
           </el-select>
         </el-form-item>
 
@@ -225,7 +239,7 @@ import {
   Picture
 } from '@element-plus/icons-vue'
 import { searchBooks, addBook, updateBook, deleteBook } from '../../api/book'
-import { getFirstLevelCategories } from '../../api/category'
+import { getFirstLevelCategories, getChildrenCategories } from '../../api/category'
 
 const loading = ref(false)
 const submitLoading = ref(false)
@@ -266,7 +280,16 @@ const formRules = {
 async function fetchCategories() {
   try {
     const res = await getFirstLevelCategories()
-    categories.value = res.data
+    const firstLevel = res.data
+    for (const cat of firstLevel) {
+      try {
+        const childRes = await getChildrenCategories(cat.id)
+        cat.children = childRes.data
+      } catch (e) {
+        cat.children = []
+      }
+    }
+    categories.value = firstLevel
   } catch (e) {
     console.error(e)
   }

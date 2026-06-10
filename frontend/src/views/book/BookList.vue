@@ -16,18 +16,36 @@
       <div class="search-card">
         <div class="search-fields">
           <el-select
+            v-model="searchForm.sortBy"
+            class="search-select sort-select"
+            @change="handleSearch"
+          >
+            <el-option label="最新上架" value="newest" />
+            <el-option label="书名排序" value="title" />
+            <el-option label="作者排序" value="author" />
+            <el-option label="库存最多" value="stock" />
+          </el-select>
+
+          <el-select
             v-model="searchForm.categoryId"
             placeholder="选择分类"
             clearable
             class="search-select"
             @change="handleCategoryChange"
           >
-            <el-option
+            <el-option-group
               v-for="cat in categories"
               :key="cat.id"
               :label="cat.name"
-              :value="cat.id"
-            />
+            >
+              <el-option :label="cat.name" :value="cat.id" />
+              <el-option
+                v-for="child in cat.children"
+                :key="child.id"
+                :label="'　' + child.name"
+                :value="child.id"
+              />
+            </el-option-group>
           </el-select>
 
           <el-input
@@ -138,13 +156,11 @@
       <div v-if="total > 0" class="pagination-section">
         <el-pagination
           v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
+          :page-size="pageSize"
           :total="total"
-          :page-sizes="[8, 12, 16, 24]"
-          layout="total, sizes, prev, pager, next, jumper"
+          layout="total, prev, pager, next, jumper"
           background
           @current-change="fetchBooks"
-          @size-change="handleSizeChange"
         />
       </div>
     </div>
@@ -161,10 +177,11 @@ import {
   Reading,
   User,
   OfficeBuilding,
-  FolderOpened
+  FolderOpened,
+  Sort
 } from '@element-plus/icons-vue'
 import { searchBooks } from '../../api/book'
-import { getFirstLevelCategories } from '../../api/category'
+import { getFirstLevelCategories, getChildrenCategories } from '../../api/category'
 
 const router = useRouter()
 const isVisible = ref(false)
@@ -172,20 +189,30 @@ const loading = ref(false)
 const books = ref([])
 const categories = ref([])
 const currentPage = ref(1)
-const pageSize = ref(12)
+const pageSize = ref(10)
 const total = ref(0)
 
 const searchForm = reactive({
   keyword: '',
   author: '',
   publisher: '',
-  categoryId: null
+  categoryId: null,
+  sortBy: 'newest'
 })
 
 async function fetchCategories() {
   try {
     const res = await getFirstLevelCategories()
-    categories.value = res.data
+    const firstLevel = res.data
+    for (const cat of firstLevel) {
+      try {
+        const childRes = await getChildrenCategories(cat.id)
+        cat.children = childRes.data
+      } catch (e) {
+        cat.children = []
+      }
+    }
+    categories.value = firstLevel
   } catch (e) {
     console.error('Failed to fetch categories:', e)
   }
@@ -196,7 +223,8 @@ async function fetchBooks() {
   try {
     const params = {
       page: currentPage.value,
-      size: pageSize.value
+      size: pageSize.value,
+      sortBy: searchForm.sortBy
     }
     if (searchForm.keyword) params.keyword = searchForm.keyword
     if (searchForm.author) params.author = searchForm.author
@@ -223,17 +251,13 @@ function handleReset() {
   searchForm.author = ''
   searchForm.publisher = ''
   searchForm.categoryId = null
+  searchForm.sortBy = 'newest'
   currentPage.value = 1
   fetchBooks()
 }
 
 function handleCategoryChange() {
   handleSearch()
-}
-
-function handleSizeChange() {
-  currentPage.value = 1
-  fetchBooks()
 }
 
 function goToDetail(id) {
