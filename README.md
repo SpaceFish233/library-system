@@ -45,8 +45,11 @@ library system/
 │   │       ├── service/      # 服务层
 │   │       ├── task/         # 定时任务
 │   │       └── util/         # 工具类
-│   └── src/main/resources/
-│       └── application.yml   # 配置文件
+│   ├── src/main/resources/
+│   │   ├── application.yml   # 配置文件
+│   │   └── schema.sql        # 数据库建表及初始数据
+│   └── uploads/              # 上传的封面图片
+│       └── library-covers/
 │
 └── frontend/                 # 前端项目
     └── src/
@@ -68,20 +71,18 @@ library system/
 
 ### 1. 数据库配置
 
-1. 创建 MySQL 数据库：
-```sql
-CREATE DATABASE librarysystem DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+1. 确保 MySQL 服务已启动，然后导入数据库（包含建表和初始数据）：
+```bash
+mysql -u root -p < library-backend/src/main/resources/schema.sql
 ```
 
-2. 创建数据表（项目启动后 MyBatis-Plus 自动映射，或手动执行建表 SQL）
-
-3. 修改数据库配置（`library-backend/src/main/resources/application.yml`）：
+2. 如需修改数据库账号密码，编辑 `library-backend/src/main/resources/application.yml`：
 ```yaml
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/librarysystem?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root        # 改成你的用户名
-    password: root        # 改成你的密码
+    password: 123456      # 改成你的密码
 ```
 
 ### 2. 启动后端
@@ -219,7 +220,7 @@ A: 检查 MySQL 是否启动，用户名密码是否正确（默认 root / 12345
 A: 确保后端已启动，Vite 代理配置正确。
 
 **Q: 上传封面失败？**
-A: 检查 `E:/uploads/library-covers/` 目录是否存在且有写入权限。
+A: 检查 `library-backend/uploads/library-covers/` 目录是否存在且有写入权限。
 
 **Q: 需要管理员权限运行 Maven？**
 A: Windows 下启动 MySQL 服务需要管理员权限，可右键终端以管理员身份运行。

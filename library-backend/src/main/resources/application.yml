@@ -24,7 +24,7 @@ mybatis-plus:
 
 # 文件上传路径
 file:
-  upload-path: E:/uploads/library-covers/
+  upload-path: ./uploads/library-covers/
 
 # JWT配置
 jwt:
